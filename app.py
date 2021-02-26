@@ -17,7 +17,12 @@ def func(x):
         return 1
     else:
         return 0
-
+    
+def pred_fn(x):
+    for i in range (len(x)):
+        x[i] = func(x[i])
+    return x[0]
+    
 @app.route('/predict',methods=['POST']) ## on post request /predict 
 def predict():
     if request.method=='POST':     
@@ -26,15 +31,9 @@ def predict():
         vect = cv.transform(data).toarray() ## transforming the list of sentence into vecotor form
         y_pred = model.predict(vect) ## predicting the class(1=spam,0=ham)
         #return render_template('result.html',prediction=pred) ## returning result.html with prediction var value as class value(0,1)
+        pred = pred_fn(y_pred)       
         
-        for j in range (len(y_pred[i])):
-            y_pred[j] = func(y_pred[j])
-            
-        pred = []
-        for i in range (len(y_pred)):
-            pred.append(int(y_pred[i].all()))
-        
-        if pred.all()==1:
+        if pred==1:
             return render_template('index.html',prediction_text="SPAM")
         else:
             return render_template('index.html',prediction_text="NOT SPAM")
